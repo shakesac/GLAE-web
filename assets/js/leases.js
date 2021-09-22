@@ -132,11 +132,10 @@ function getLeaseItems(lid) {
             if (data.length > 0) {
                 for (i in data) {
                     table += '<tr class="d-flex fs-7"><td class="col-4 align-middle">' + data[i].name + '</td>'+
-                    '<td class="col-6 align-middle">' + data[i].description + '</td>' +
-                    '<td class="col-1 text-center"> - </td>' +
+                    '<td class="col-7 text-start align-middle">' + data[i].description + '</td>' +
+                    //'<td class="col-1 text-center"> - </td>' +
                     '<td class="col-1 text-end">'+
-                    '<button type="button" title="Remover item" onclick="removeItem('+ lid +','+data[i].id+')" class="btn btn-sm btn-outline-danger">'+ 
-                    '<i class="bi bi-cart-dash"></i></button>'+
+                    '<button type="button" class="btn btn-sm round-btn btn-outline-danger" title="Remover item" onclick="removeItem('+ lid +','+data[i].id+')"><i class="bi bi-dash-lg"></i></button>'
                     '</td></tr>'
                 }
             }
@@ -144,16 +143,17 @@ function getLeaseItems(lid) {
                 await Swal.fire({
                     title: '<i class="bi bi-box-seam pe-2"></i>Material',
                     width: 600,
-                    confirmButtonText: "OK",
-                    showLoaderOnConfirm: true,
+                    showCancelButton: true,
+                    cancelButtonText: 'Fechar',
+                    showConfirmButton: false,
                     allowOutsideClick: false,
                     allowEnterKey: true,
                     html:
                         '<table class="table table-hover align-middle" id="itens">' +
                         '<tr class="d-flex">' +
                         '<th class="col-4">Item</th>' +
-                        '<th class="col-6">Descrição</th>' +
-                        '<th class="col-1 text-center">Un.</th>' +
+                        '<th class="col-7 texte-start">Descrição</th>' +
+                        //'<th class="col-1 text-center">Un.</th>' +
                         '<th class="col-1"></th>' +
                         '</tr>' +
                         table +
@@ -163,12 +163,11 @@ function getLeaseItems(lid) {
         },
         error: function (err) {
             msg = JSON.parse(err.responseText);
-            Swal.fire(
-                'Erro!',
-                msg.message,
-                'error'
-            );
-            exit = err;
+            Swal.fire({
+                icon: 'error',
+                text: msg.message,
+                confirmButtonColor: '#212529',
+            })
         }
     })
 }
@@ -177,13 +176,13 @@ function removeItem(lid, iid) {
     (async () => {
         await Swal.fire({
             title: 'Tem a certeza?',
-            text: "Esta operação não é reversível!",
-            icon: 'warning',
+            text: "Esta acção é irreversível.",
+            icon: 'question',
             showCancelButton: true,
-            cancelButtonColor: '#3085d6',
             confirmButtonColor: '#d33',
-            confirmButtonText: 'Sim, eliminar!',
-            cancelButtonText: 'Cancelar'
+            confirmButtonText: 'Eliminar',
+            confirmButtonColor: '#d33',
+            cancelButtonText: "Cancelar",
         }).then((result) => {
             const token = getCookie('login')
             $.ajax({
@@ -201,14 +200,13 @@ function removeItem(lid, iid) {
                 },
                 error: function (err) {
                     msg = JSON.parse(err.responseText);
-                    Swal.fire(
-                        'Erro!',
-                        msg.message,
-                        'error'
-                    ).then(function () {
+                    Swal.fire({
+                        icon: 'error',
+                        text: msg.message,
+                        confirmButtonColor: '#212529',
+                    }).then(function () {
                         getLeaseItems(lid)
-                    });
-                    exit = err;
+                    })
                 }
             });
         });

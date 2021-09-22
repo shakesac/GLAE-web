@@ -4,7 +4,7 @@ function getUser(v_id) {
         document.getElementById('setPassword').style.display = "none";
         document.getElementById('create').style.display = "none";
         (async () => {
-            let token = getCookie("login");
+            const token = getCookie("login");
             await $.ajax({
                 url: linkUrl + "/user/" + v_id,
                 type: "GET",
@@ -16,9 +16,16 @@ function getUser(v_id) {
                     document.getElementById('email').value = data.email;
                     document.getElementById('address').value = data.address;
                     document.getElementById('phone').value = data.phoneNumber;
-                    getSection(data.subsection.section.id);
-                    getCargo(data.cargoId);
-                    getSubSection(data.subsection.section.id, data.subsectionId);
+                    if (data.subsectionId) {
+                        getSection(data.subsection.section.id)
+                        getSubSection(data.subsection.section.id, data.subsectionId);
+                    } else {
+                        getSection(0)
+                        getSubSection(0,0);
+                    }
+                    if (data.cargoId) {
+                        getCargo(data.cargoId);
+                    } else getCargo(0)
                     document.getElementById('createdAt').value = data.createdAt.substr(0, 10);
                     document.getElementById('updatedAt').value = data.updatedAt.substr(0, 10);
                     if(data.roleId == 1){
@@ -30,12 +37,11 @@ function getUser(v_id) {
                 },
                 error: function (err) {
                     msg = JSON.parse(err.responseText);
-                    Swal.fire(
-                        'Erro!',
-                        msg.message,
-                        'error'
-                    );
-                    exit = err;
+                    Swal.fire({
+                        icon: 'error',
+                        text: msg.message,
+                        confirmButtonColor: '#212529',
+                    })
                 }
             })
         })();
@@ -74,11 +80,6 @@ function saveuser() {
     if (document.getElementById("email").value == "") {
         errForm += "Email é obrigatório.<br>";
     }
-
-    if (document.getElementById("cargoId").value == "") {
-        errForm += "Cargo é obrigatório.<br>";
-    }
-
     if (document.getElementById("subsectionId").value == "") {
         errForm += "Secção é obrigatório.<br>";
     }
@@ -107,9 +108,8 @@ function saveuser() {
             cargoId: document.getElementById("cargoId").value,
             roleId: isAdmin,
         };
-        var exit = "no";
-        var json = JSON.stringify(objUser);
-        token = getCookie("login");
+        const json = JSON.stringify(objUser);
+        const token = getCookie("login");
         $.ajax({
             url: linkUrl + "/user/" + getCookie("userId"),
             type: "PUT",
@@ -162,10 +162,6 @@ function createUser() {
         errForm += "Email é obrigatório.<br>";
     }
 
-    if (document.getElementById("cargoId").value == "") {
-        errForm += "Cargo é obrigatório.<br>";
-    }
-
     if (document.getElementById("subsectionId").value == "") {
         errForm += "Secção é obrigatório.<br>";
     }
@@ -177,7 +173,6 @@ function createUser() {
         if (document.getElementById("rpassword").value == "") {
             errForm += "Confirmação é obrigatório.<br>";
         } else {
-
             if (document.getElementById("password").value != document.getElementById("rpassword").value) {
                 errForm += "Senha e confirmação não são iguais.<br>";
             }
@@ -189,7 +184,8 @@ function createUser() {
             icon: "error",
             title: errForm,
             showConfirmButton: false,
-            timer: 4500,
+            timer: 3000,
+            showCloseButton: true,
         });
 
     } else {
@@ -212,7 +208,7 @@ function createUser() {
             roleId: isAdmin,
         };
         var exit = "no";
-        var json = JSON.stringify(objUser);
+        const json = JSON.stringify(objUser);
         token = getCookie("login");
         $.ajax({
             url: linkUrl + "/user/new",
@@ -276,7 +272,7 @@ function getCargo(v_id) {
 }
 
 
-function getSection(v_id) {
+function getSection(id) {
     (async () => {
         const token = getCookie('login')
         await $.ajax({
@@ -289,17 +285,16 @@ function getSection(v_id) {
                 data = data.data;
                 if (data.length > 0) {
                     for (i in data) {
-                        var opt = document.createElement('option')
+                        let opt = document.createElement('option')
                         opt.value = data[i].id;
                         opt.innerHTML = data[i].section;
-                        if (data[i].id == v_id) {
+                        if (data[i].id == id) {
                             opt.selected = 'selected';
                         }
                         select.appendChild(opt);
-
                     }
-
                 }
+                if (!data[i].id) opt.selectedIndex = 0;
             },
         })
     })();
@@ -318,7 +313,7 @@ function getSubSection(v_id, idSelect) {
                 data = data.data;
                 var opt = document.createElement('option')
                 opt.value = '';
-                opt.innerHTML = 'Grupo';
+                opt.innerHTML = 'Escolher';
                 select.appendChild(opt);
                 for (i in data) {
                     opt = document.createElement('option')
@@ -329,7 +324,6 @@ function getSubSection(v_id, idSelect) {
                     }
                     select.appendChild(opt);
                 }
-
             }
         })
     })();

@@ -13,9 +13,16 @@ function getUser() {
                     document.getElementById('email').value = data.email;
                     document.getElementById('address').value = data.address;
                     document.getElementById('phone').value = data.phoneNumber;
-                    getSection(data.subsection.sectionId);
-                    getCargo(data.cargoId);
-                    getSubSection(data.subsection.sectionId, data.subsectionId);
+                    if (data.subsectionId) {
+                        getSection(data.subsection.section.id)
+                        getSubSection(data.subsection.section.id, data.subsectionId);
+                    } else {
+                        getSection(0)
+                        getSubSection(0,0);
+                    }
+                    if (data.cargoId) {
+                        getCargo(data.cargoId);
+                    } else getCargo(0)
                     document.getElementById('createdAt').value = data.createdAt.substr(0, 10);
                     document.getElementById('updatedAt').value = data.updatedAt.substr(0, 10);
                     if(data.roleId == 1){

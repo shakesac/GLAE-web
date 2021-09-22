@@ -1,17 +1,14 @@
-
 // Chama o serviço que devolve todos as categorias do utilizador
 function getAllSubsections(section) {
-            //let section = document.getElementById("section").value;
-
-            (async () => {
-                let searchUrl
-                if (!section) searchUrl = "/subsection/all";
-                else searchUrl = "/subsection/all?section=" + section;
-                const token=getCookie("login");
-                await $.ajax({
-                    url: linkUrl + searchUrl,
-                    type: "GET",
-                    beforeSend: function (xhr) { xhr.setRequestHeader('x-access-token', token); },
+    (async () => {
+        let searchUrl
+        if (!section) searchUrl = "/subsection/all"
+        else searchUrl = "/subsection/all?section=" + section;
+        const token=getCookie("login");
+        await $.ajax({
+            url: linkUrl + searchUrl,
+            type: "GET",
+            beforeSend: function (xhr) { xhr.setRequestHeader('x-access-token', token); },
             success: function (data) {
                 table = document.getElementById('AllSubsections');
                 data = data.data;
@@ -93,6 +90,7 @@ function editSubsection(v_id) {
             title: "Editar Grupo",
             showCancelButton: true,
             confirmButtonText: "Guardar",
+            confirmButtonColor: '#212529',
             cancelButtonText: "Cancelar",
             showLoaderOnConfirm: true,
             allowOutsideClick: true,
@@ -203,6 +201,7 @@ function createSubsection() {
             title: "Novo Grupo",
             showCancelButton: true,
             confirmButtonText: "Criar",
+            confirmButtonColor: '#212529',
             cancelButtonText: "Cancelar",
             showLoaderOnConfirm: true,
             allowOutsideClick: true,
@@ -227,14 +226,14 @@ function createSubsection() {
                 '</div>',
             preConfirm: () => {
                 let error_msg = "";
-                if (!document.getElementById("subsection").value) {
-                    error_msg += "Nome é um campo obrigatório.<br>";
+                if (!document.getElementById('subsection').value) {
+                    error_msg += '"Nome" é um campo obrigatório.<br>'
                 }
-                if (!document.getElementById("code").value) {
-                    error_msg += "Código é um campo obrigatório.<br>";
+                if (!document.getElementById('code').value) {
+                    error_msg += '"Código" é um campo obrigatório.<br>'
                 }
                 if (!document.getElementById("sectionId").value) {
-                    error_msg += "Secção é um campo obrigatório.<br>";
+                    error_msg += '"Secção" é um campo obrigatório.'
                 }
                 if (error_msg) {
                     Swal.showValidationMessage(error_msg);
@@ -274,11 +273,11 @@ function createSubsection() {
                 },
                 error: function (err) {
                     msg = JSON.parse(err.responseText);
-                    Swal.fire(
-                        'Erro!',
-                        msg.message,
-                        'error'
-                    ).then(function () {
+                    Swal.fire({
+                        icon: 'error',
+                        text: msg.message,
+                        confirmButtonColor: '#212529',
+                    }).then(function () {
                         getAllSubsections();
                     });
                     exit = err;
@@ -293,31 +292,40 @@ function delSubsection(v_id) {
     (async () => {
         const delSection = await Swal.fire({
             title: 'Tem a certeza?',
-            text: "Esta acção é irreversível!",
-            icon: 'warning',
+            text: "Esta acção é irreversível.",
+            icon: 'question',
             showCancelButton: true,
-            cancelButtonColor: '#3085d6',
             confirmButtonColor: '#d33',
-            confirmButtonText: 'Sim, eliminar'
+            confirmButtonText: 'Eliminar',
+            confirmButtonColor: '#d33',
+            cancelButtonText: "Cancelar",
         });
-        if (delSection) {
+        if (delSection.isConfirmed) {
             const token = getCookie('login')
             $.ajax({
                 url: linkUrl + "/subsection/" + v_id,
                 type: "DELETE",
                 beforeSend: function (xhr) { xhr.setRequestHeader('x-access-token', token)},
                 success: function (result) {
-                    Swal.fire(
-                        'Eliminado.',
-                        'O grupo foi eliminado.',
-                        'success'
-                    ).then(function () {
+                    Swal.fire({                        
+                        icon: 'success',
+                        title: result.message,
+                        timer: 1500,
+                        showConfirmButton: false,
+                    }).then(function () {
                         getAllSubsections();
                     });
 
                 },
                 error: function (err) {
-                    alert(err.statusText);
+                    msg = JSON.parse(err.responseText);
+                    Swal.fire({
+                        icon: 'error',
+                        text: msg.message,
+                        confirmButtonColor: '#212529',
+                    }).then(function () {
+                        getAllSections();
+                    })
                     exit = err;
                 }
             });

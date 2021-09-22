@@ -42,7 +42,7 @@ function getAllCargos() {
 
 function editCargo(v_id) {
     (async () => {
-        let token = getCookie("login");
+        const token = getCookie("login");
         await $.ajax({
             url: linkUrl + "/cargo/" + v_id,
             type: "GET",
@@ -53,35 +53,35 @@ function editCargo(v_id) {
             }
         })
         const { value: cargoForm } = await Swal.fire({
-            title: "Cargo",
+            title: "Editar cargo",
             showCancelButton: true,
             confirmButtonText: "Guardar",
+            confirmButtonColor: '#212529',
             cancelButtonText: "Cancelar",
             showLoaderOnConfirm: true,
             allowOutsideClick: true,
             allowEnterKey: true,
             html:
-                ' <form id="cargoForm" >' +
+                '<form id="cargoForm" >' +
                 '<p style="font-size: 50px">' +
                 '<i class="bi bi-pencil-square"></i></p>' +
                 '<div class="container">' +
                 '<div class="input-group input-group-sm mb-3">' +
-                '<span class="input-group-text">Nome</span>' +
+                '<span class="input-group-text">Cargo</span>' +
                 '<input type="text" id="cargo" class="form-control" maxlength="100" value="' + cargo + '" required>' +
                 '</div>' +
                 '</div>',
             preConfirm: () => {
-
-                var error_msg = "";
-                if (!document.getElementById("cargo").value) {
-                    error_msg += "Cargo é origatório.<br>";
+                let errorMsg = ''
+                if (!document.getElementById('cargo').value) {
+                    errorMsg += '"Cargo" é um campo obrigatório.<br>'
                 }
+                if (errorMsg) Swal.showValidationMessage(errorMsg)
                 return [
                     document.getElementById("cargo").value,
-                ];
+                ]
             },
         });
-        // se não tem erros no preenchimento chama o serviço de validação
         if (cargoForm) {
             objCargo = {
                 cargo: cargoForm[0],
@@ -95,7 +95,6 @@ function editCargo(v_id) {
                 dataType: "json",
                 beforeSend: function (xhr) { xhr.setRequestHeader('x-access-token', token); },
                 success: function (result) {
-                    console.log(result);
                     getAllCargos();
                     Swal.fire({
                         icon: "success",
@@ -107,11 +106,10 @@ function editCargo(v_id) {
                 },
                 error: function (err) {
                     msg = JSON.parse(err.responseText);
-                    Swal.fire(
-                        'Erro!',
-                        msg.message,
-                        'error'
-                    ).then(function () {
+                    Swal.fire({
+                        icon: 'error',
+                        text: msg.message
+                    }).then(function () {
                         getAllCargos();
                     });
                     exit = err;
@@ -127,9 +125,10 @@ function createCargo(v_id) {
     (async () => {
         let token = getCookie("login");
         const { value: cargoForm } = await Swal.fire({
-            title: "Cargo",
+            title: "Novo cargo",
             showCancelButton: true,
-            confirmButtonText: "Guardar",
+            confirmButtonText: "Criar",
+            confirmButtonColor: '#212529',
             cancelButtonText: "Cancelar",
             showLoaderOnConfirm: true,
             allowOutsideClick: true,
@@ -140,23 +139,16 @@ function createCargo(v_id) {
                 '<i class="bi bi-pencil-square"></i></p>' +
                 '<div class="container">' +
                 '<div class="input-group input-group-sm mb-3">' +
-                '<span class="input-group-text">Nome</span>' +
+                '<span class="input-group-text">Cargo</span>' +
                 '<input type="text" id="cargo" class="form-control" maxlength="100" required>' +
                 '</div>' +
                 '</div>',
             preConfirm: () => {
-
-                var error_msg = "";
-                if (!document.getElementById("cargo").value) {
-                    error_msg += "Cargo é origatório.<br>";
-                }    if (error_msg != "") {
-                    Swal.fire({
-                        icon: "error",
-                        title: error_msg,
-                        showConfirmButton: false,
-                        timer: 4500,
-                    });
+                let errorMsg = ''
+                if (!document.getElementById('cargo').value) {
+                    errorMsg += '"Cargo" é um campo obrigatório.<br>'
                 }
+                if (errorMsg) Swal.showValidationMessage(errorMsg)
                 return [
                     document.getElementById("cargo").value,
                 ];
@@ -176,7 +168,6 @@ function createCargo(v_id) {
                 dataType: "json",
                 beforeSend: function (xhr) { xhr.setRequestHeader('x-access-token', token); },
                 success: function (result) {
-                    console.log(result);
                     getAllCargos();
                     Swal.fire({
                         icon: "success",
@@ -188,11 +179,11 @@ function createCargo(v_id) {
                 },
                 error: function (err) {
                     msg = JSON.parse(err.responseText);
-                    Swal.fire(
-                        'Erro!',
-                        msg.message,
-                        'error'
-                    ).then(function () {
+                    Swal.fire({
+                        icon: 'error',
+                        text: msg.message,
+                        confirmButtonColor: '#212529',
+                    }).then(function () {
                         getAllSections();
                     });
                     exit = err;
@@ -208,12 +199,13 @@ function delCargo(v_id) {
         var category = "";
         const { value: formCargo } = await Swal.fire({
             title: 'Tem a certeza?',
-            text: "Esta operação não é reversivél!",
-            icon: 'warning',
+            text: "Esta acção é irreversível.",
+            icon: 'question',
             showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Sim, eliminar!'
+            confirmButtonColor: '#d33',
+            confirmButtonText: 'Eliminar',
+            confirmButtonColor: '#d33',
+            cancelButtonText: "Cancelar",
         });
         if (formCargo){
             const token = getCookie('login')
@@ -222,22 +214,22 @@ function delCargo(v_id) {
                 type: "DELETE",
                 beforeSend: function (xhr) { xhr.setRequestHeader('x-access-token', token) },
                 success: function (result) {
-                    Swal.fire(
-                        'Eliminar!',
-                        result.message,
-                        'success'
-                    ).then(function () {
+                    Swal.fire({                        
+                        icon: 'success',
+                        title: result.message,
+                        timer: 1500,
+                        showConfirmButton: false,
+                    }).then(function () {
                         getAllCargos();
                     });
 
                 },
                 error: function (err) {
                     msg = JSON.parse(err.responseText);
-                    Swal.fire(
-                        'Erro!',
-                        msg.message,
-                        'error'
-                    );
+                    Swal.fire({
+                        icon: 'error',
+                        text: msg.message
+                    })
                     exit = err;
                 }
             });

@@ -57,9 +57,10 @@ function editSection(v_id) {
             }
         })
         const { value: sectionForm } = await Swal.fire({
-            title: "Secção",
+            title: "Editar secção",
             showCancelButton: true,
             confirmButtonText: "Guardar",
+            confirmButtonColor: '#212529',
             cancelButtonText: "Cancelar",
             showLoaderOnConfirm: true,
             allowOutsideClick: true,
@@ -79,17 +80,20 @@ function editSection(v_id) {
                 '</div>' +
                 '</div>',
             preConfirm: () => {
-                let error_msg = "";
-                if (!document.getElementById("section").value) {
-                    error_msg += "Secção é origatória.<br>";
+                let errorMsg = ''
+                if (!document.getElementById('section').value) {
+                    errorMsg += '"Nome" é um campo obrigatório.<br>'
                 }
+                if (!document.getElementById('code').value) {
+                    errorMsg += '"Código" é um campo obrigatório.'
+                }
+                if (errorMsg) Swal.showValidationMessage(errorMsg)
                 return [
                     document.getElementById("code").value,
                     document.getElementById("section").value,
                 ];
             },
         });
-        // se não tem erros no preenchimento chama o serviço de validação
         if (sectionForm) {
             objSection = {
                 code: sectionForm[0],
@@ -105,7 +109,6 @@ function editSection(v_id) {
                 dataType: "json",
                 beforeSend: function (xhr) { xhr.setRequestHeader('x-access-token', token)},
                 success: function (result) {
-                    console.log(result);
                     getAllSections();
                     Swal.fire({
                         icon: "success",
@@ -116,18 +119,14 @@ function editSection(v_id) {
 
                 },
                 error: function (err) {
-                    alert('erro' + json);
                     msg = JSON.parse(err.responseText);
-                    Swal.fire(
-                        'Erro!',
-                        msg.message,
-                        'error'
-                    ).then(function () {
-                        getAllSections();
-                    });
-                    exit = err;
+                    Swal.fire({
+                        icon: 'error',
+                        text: msg.message,
+                        confirmButtonColor: '#212529',
+                    })
                 }
-            });
+            })
 
         }
     })();
@@ -136,17 +135,14 @@ function editSection(v_id) {
 function createSection() {
     (async () => {
         const { value: formLogin } = await Swal.fire({
-            title: "Secção",
+            title: "Nova secção",
             showCancelButton: true,
             confirmButtonText: "Criar",
+            confirmButtonColor: '#212529',
             cancelButtonText: "Cancelar",
             showLoaderOnConfirm: true,
             allowOutsideClick: true,
             allowEnterKey: true,
-            // customClass: {
-            //     confirmButton: 'loginButton',
-            //     cancelButton: 'loginButton'
-            // },
             html:
                 '<form id="sectionForm">' +
                 '<p style="font-size: 50px">' +
@@ -161,14 +157,15 @@ function createSection() {
                 '<input type="number" id="code" class="form-control" min="0" max="9" required>' +
                 '</div>' +
                 '</div>',
-            // footer:
-            //     '<span class="psw">Forgot <a href="#">password?</a></span>',
-
             preConfirm: () => {
-                var error_msg = "";
-                if (!document.getElementById("section").value) {
-                    error_msg += "Campo obrigatório.<br>";
+                let errorMsg = ''
+                if (!document.getElementById('section').value) {
+                    errorMsg += '"Nome" é um campo obrigatório.<br>'
                 }
+                if (!document.getElementById('code').value) {
+                    errorMsg += '"Código" é um campo obrigatório.'
+                }
+                if (errorMsg) Swal.showValidationMessage(errorMsg)
                 return [
                     document.getElementById("code").value,
                     document.getElementById("section").value,
@@ -192,25 +189,21 @@ function createSection() {
                 beforeSend: function (xhr) { xhr.setRequestHeader('x-access-token', token)},
                 success: function (result) {
                     Swal.fire({
-                        icon: "success",
+                        icon: 'success',
                         title: result.message,
                         showConfirmButton: false,
                         timer: 1500,
                     }).then(function () {
-                        getAllSections();
-                    });
-
+                        getAllSections()
+                    })
                 },
                 error: function (err) {
                     msg = JSON.parse(err.responseText);
-                    Swal.fire(
-                        'Erro!',
-                        msg.message,
-                        'error'
-                    ).then(function () {
-                        getAllSections();
-                    });
-                    exit = err;
+                    Swal.fire({
+                        icon: 'error',
+                        text: msg.message,
+                        confirmButtonColor: '#212529',
+                    })
                 }
             });
 
@@ -220,42 +213,39 @@ function createSection() {
 
 function delSection(v_id) {
     (async () => {
-        const { value: formLogin } = await Swal.fire({
+        const delSection = await Swal.fire({
             title: 'Tem a certeza?',
-            text: "Esta operação não é reversivél!",
-            icon: 'warning',
+            text: "Esta acção é irreversível.",
+            icon: 'question',
             showCancelButton: true,
-            cancelButtonText: 'Cancelar',
-            cancelButtonColor: '#3085d6',
             confirmButtonColor: '#d33',
-            confirmButtonText: 'Sim, eliminar'
-        });
-        if (formLogin) {
+            confirmButtonText: 'Eliminar',
+            confirmButtonColor: '#d33',
+            cancelButtonText: "Cancelar",
+        })
+        if (delSection.isConfirmed) {
             const token = getCookie('login')
             $.ajax({
                 url: linkUrl + "/section/" + v_id,
                 type: "DELETE",
                 beforeSend: function (xhr) { xhr.setRequestHeader('x-access-token', token)},
                 success: function (result) {
-                    Swal.fire(
-                        'Eliminar!',
-                        result.message,
-                        'success'
-                    ).then(function () {
-                        getAllSections();
-                    });
-
+                    Swal.fire({                        
+                        icon: 'success',
+                        title: result.message,
+                        timer: 1500,
+                        showConfirmButton: false,
+                    }).then(function () {
+                        getAllSections()
+                    })
                 },
                 error: function (err) {
                     msg = JSON.parse(err.responseText);
-                    Swal.fire(
-                        'Erro!',
-                        msg.message,
-                        'error'
-                    ).then(function () {
-                        getAllSections();
-                    });
-                    exit = err;
+                    Swal.fire({
+                        icon: 'error',
+                        text: msg.message,
+                        confirmButtonColor: '#212529',
+                    })
                 }
             });
         }

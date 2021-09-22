@@ -58,7 +58,7 @@ function getAllItens() {
                 searchUrl = `/item/all/available?start=${start}&end=${end}&category=${category}`
             }
             const token = getCookie('login');
-            await $.ajax({
+            $.ajax({
                 url: linkUrl + searchUrl,
                 type: "GET",
                 beforeSend: function (xhr) { xhr.setRequestHeader('x-access-token', token); },
@@ -78,10 +78,10 @@ function getAllItens() {
                             if (!bag.includes(data[i].id)) {
                                 auxTable += '<tr class="d-flex">' +
                                     '<td class="col-2">' + data[i].name + '</td>' +
-                                    '<td class="col-6">' + data[i].description + '</td>'
+                                    '<td class="col-6 text-start">' + data[i].description + '</td>'
                                 auxTable += '<td class="col-2"> ' + data[i].item_type.type + '</td>' +
                                     '<td class="col-1 text-end"><div class="btn-group" role="group" aria-label="inspection">' +
-                                    '<a href="javascript:addItem(' + data[i].id + ', `' + data[i].name + '`);" title="Adicionar ao carrinho"><button type="button" class="btn btn-sm round-btn btn-outline-success"><i class="bi bi-plus-lg"></i></button></a>' +
+                                    '<a href="javascript:addItem(' + data[i].id + ', `' + data[i].name + '`);" title="Adicionar ao cesto"><button type="button" class="btn btn-sm round-btn btn-outline-success"><i class="bi bi-plus-lg"></i></button></a>' +
                                     '</div></td>'
                                 auxTable += '</tr>';
                             }
@@ -157,6 +157,7 @@ function viewBasket() {
         Swal.fire({
             title: '<i class="bi bi-basket pe-2"></i>Cesto',
             text: 'O cesto está vazio.',
+            showConfirmButton: false,
             showCancelButton: true,
             cancelButtonText: 'Fechar',
             focusCancel: true,
@@ -189,6 +190,9 @@ function viewBasket() {
                         allowEnterKey: true,
                         showCloseButton: true,
                         showConfirmButton: true,
+                        showCancelButton: true,
+                        cancelButtonText: 'Fechar',
+                        focusCancel: true,
                         confirmButtonText: 'Finalizar pedido',
                         confirmButtonColor: '#212529',
                         html:
@@ -270,8 +274,8 @@ function checkOut(){
             text: 'Deseja finalizar o pedido?',
             icon: 'question',
             showCancelButton: true,
-            cancelButtonColor: '#3085d6',
-            confirmButtonColor: '#d33',
+            //cancelButtonColor: '#3085d6',
+            confirmButtonColor: '#212529',
             confirmButtonText: 'Sim',
             cancelButtonText: 'Não',
             showLoaderOnConfirm: true,
@@ -284,8 +288,6 @@ function checkOut(){
                 start: document.getElementById("startDate").value,
                 end: document.getElementById("endDate").value,
                 items: aux,
-
-
             };
             const json = JSON.stringify(objItem);
             const token=getCookie('login')
@@ -328,6 +330,7 @@ function checkOut(){
 function refresh() {
     getAllItens()
 }
+
 function autoComplete() {
     document.getElementById('startDate').valueAsDate = new Date()
     document.getElementById('endDate').valueAsDate = new Date()
@@ -343,6 +346,8 @@ function checkStart() {
     const checkBox = document.getElementById('forTheDay')
     if (!value) checkBox.disabled = true
     else checkBox.disabled = false
+    const endDate = document.getElementById('endDate')
+    if (checkBox.checked) endDate.value = input.value
     refresh()
 }
 
@@ -479,8 +484,8 @@ function getLeaseItems(lid) {
             if (data.length > 0) {
                 for (i in data) {
                     table += '<tr class="d-flex fs-7"><td class="col-4 align-middle">' + data[i].name + '</td>'+
-                    '<td class="col-7 align-middle">' + data[i].description + '</td>' +
-                    '<td class="col-1 text-center"> - </td>' +
+                    '<td class="col-8 text-start align-middle">' + data[i].description + '</td>' +
+                    //'<td class="col-1 text-center"> - </td>' +
                     '</tr>'
                 }
             }
@@ -488,16 +493,17 @@ function getLeaseItems(lid) {
                 await Swal.fire({
                     title: '<i class="bi bi-box-seam pe-2"></i>Material',
                     width: 600,
-                    confirmButtonText: "OK",
-                    showLoaderOnConfirm: true,
+                    showCancelButton: true,
+                    cancelButtonText: 'Fechar',
+                    showConfirmButton: false,
                     allowOutsideClick: false,
                     allowEnterKey: true,
                     html:
                         '<table class="table table-hover align-middle" id="itens">' +
                         '<tr class="d-flex">' +
                         '<th class="col-4">Item</th>' +
-                        '<th class="col-7">Descrição</th>' +
-                        '<th class="col-1 text-center">Un.</th>' +
+                        '<th class="col-8">Descrição</th>' +
+                        //'<th class="col-1 text-center">Un.</th>' +
                         '</tr>' +
                         table +
                         '</table>',
@@ -559,12 +565,11 @@ function getStatusHistory(lid) {
         },
         error: function (err) {
             msg = JSON.parse(err.responseText);
-            Swal.fire(
-                'Erro!',
-                msg.message,
-                'error'
-            );
-            exit = err;
+            Swal.fire({
+                icon: 'error',
+                text: msg.message,
+                confirmButtonColor: '#212529',
+            })
         }
     })
 }

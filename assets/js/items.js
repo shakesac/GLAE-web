@@ -1,6 +1,7 @@
 
 function getCategory() {
     (async () => {
+        const token = getCookie('login')
         await $.ajax({
             url: linkUrl + "/item/category/all",
             type: "GET",
@@ -22,8 +23,6 @@ function getCategory() {
     })();
 }
 
-
-// Chama o serviço que devolve todos os teste de um utilizador e mostra numa tabela
 function getAllItens() {
     let category = document.getElementById("category").value;
     (async () => {
@@ -84,15 +83,15 @@ function getAllItens() {
 
         })
     })();
-
 }
 
 function getItemTypes(v_id) {
-
     (async () => {
+        const token = getCookie('login')
         $.ajax({
             url: linkUrl + "/item/category/" + v_id + "/types",
             type: "GET",
+            beforeSend: function (xhr) { xhr.setRequestHeader('x-access-token', token)},
             success: function (data) {
                 selectType = document.getElementById('type');
                 selectType.options.length = 0;
@@ -114,10 +113,11 @@ function getItemTypes(v_id) {
 }
 
 function editItem(v_id) {
-    let typeId = "";
-    var name = "";
-    var description = "";
-    var purchasedAt = "";
+    const token=getCookie("login")
+    let typeId = ''
+    let name = ''
+    let description = ''
+    let purchasedAt = ''
     $.ajax({
         url: linkUrl + "/item/" + v_id,
         type: "GET",
@@ -130,8 +130,6 @@ function editItem(v_id) {
             createdAt = data.createdAt;
             typeId = data.typeId;
             categoryId = data.item_type.item_category.id;
-
-
             select = "";
             (async () => {
                 await $.ajax({
@@ -156,7 +154,6 @@ function editItem(v_id) {
                     },
                 })
                 let select2 = '';
-                const token=getCookie("login")
                 await $.ajax({
                     url: linkUrl + "/item/category/" + categoryId + "/types",
                     type: "GET",
@@ -177,12 +174,11 @@ function editItem(v_id) {
                         select2 += '</select>'
                     },
                 })
-
-
-                const { value: formLogin } = await Swal.fire({
-                    title: "Item",
+                const { value: editItem } = await Swal.fire({
+                    title: "Editar item",
                     showCancelButton: true,
                     confirmButtonText: "Guardar",
+                    confirmButtonColor: '#212529',
                     cancelButtonText: "Cancelar",
                     showLoaderOnConfirm: true,
                     allowOutsideClick: true,
@@ -194,7 +190,7 @@ function editItem(v_id) {
                         '<div class="container">' +
                         '<div class="input-group input-group-sm mb-3">' +
                         '<span class="input-group-text">Nome</span>' +
-                        '<input type="text" id="name" "class="form-control" value="' + name + '" maxlength="100" required>' +
+                        `<input type="text" id="name" class="form-control" value="${name}" maxlength="100" required>` +
                         '</div>' +
                         '<div class="input-group input-group-sm mb-3">' +
                         '<span class="input-group-text">Descrição</span>' +
@@ -216,16 +212,13 @@ function editItem(v_id) {
                     preConfirm: () => {
                         var error_msg = "";
                         if (!document.getElementById("name").value) {
-                            error_msg += "Nome é um campo obrigatório.<br>";
-                        }
-                        if (!document.getElementById("description").value) {
-                            error_msg += "Descrição é um campo obrigatório.<br>";
+                            error_msg += '"Nome" é um campo obrigatório.<br>'
                         }
                         if (!document.getElementById("purchasedAt").value) {
-                            error_msg += "Comprado a é um campo obrigatório.<br>";
+                            error_msg += '"Aquisição" é um campo obrigatório.<br>'
                         }
                         if (!document.getElementById("type").value) {
-                            error_msg += "Tipo é um campo obrigatório.<br>";
+                            error_msg += '"Tipo" é um campo obrigatório.'
                         }
                         if (error_msg) {
                             Swal.showValidationMessage(error_msg);
@@ -238,18 +231,14 @@ function editItem(v_id) {
                         ];
                     },
                 });
-                // se não tem erros no preenchimento chama o serviço de validação
-                if (formLogin) {
+                if (editItem) {
                     objItem = {
-                        name: formLogin[0],
-                        description: formLogin[1],
-                        purchasedAt: formLogin[2],
-                        typeId: formLogin[3],
-
-
+                        name: editItem[0],
+                        description: editItem[1],
+                        purchasedAt: editItem[2],
+                        typeId: editItem[3],
                     };
                     const json = JSON.stringify(objItem);
-                    const token=getCookie('login')
                     $.ajax({
                         url: linkUrl + "/item/" + v_id,
                         type: "PUT",
@@ -258,7 +247,6 @@ function editItem(v_id) {
                         dataType: "json",
                         beforeSend: function (xhr) { xhr.setRequestHeader('x-access-token', token)},
                         success: function (result) {
-                            //document.cookie = "userId=" + result;
                             Swal.fire({
                                 icon: "success",
                                 title: result.message,
@@ -270,7 +258,12 @@ function editItem(v_id) {
 
                         },
                         error: function (err) {
-                            exit = err;
+                            msg = JSON.parse(err.responseText);
+                            Swal.fire({
+                                icon: 'error',
+                                text: msg.message,
+                                confirmButtonColor: '#212529',
+                            })
                         }
                     });
 
@@ -307,7 +300,6 @@ function delItem(v_id) {
                     ).then(function () {
                         getAllItens();
                     });
-
                 },
                 error: function (err) {
                     msg = JSON.parse(err.responseText);
@@ -347,17 +339,17 @@ function createItem() {
                 select += '</select>'
             },
         })
-
-        const { value: formLogin } = await Swal.fire({
-            title: "Item",
+        const { value: createItem } = await Swal.fire({
+            title: "Novo item",
             showCancelButton: true,
             confirmButtonText: "Criar",
+            confirmButtonColor: '#212529',
             cancelButtonText: "Cancelar",
             showLoaderOnConfirm: true,
             allowOutsideClick: true,
             allowEnterKey: true,
             html:
-                '<form id="itemForm" >' +
+                '<form id="itemForm">' +
                 '<div class="imgcontainer">' +
                 '<i class="bi bi-pencil-square"></i></div><br><br>' +
                 '<div class="container">' +
@@ -384,24 +376,18 @@ function createItem() {
                 '</select>' +
                 '</div>' +
                 '</div></form>',
-
             preConfirm: () => {
-                let error_msg = "";
-                if (!document.getElementById("name").value) {
-                    error_msg += "Nome é um campo obrigatório.<br>";
+                let errorMsg = ''
+                if (!document.getElementById('name').value) {
+                    errorMsg += '"Nome" é um campo obrigatório.<br>'
                 }
-                if (!document.getElementById("description").value) {
-                    error_msg += "Descrição é um campo obrigatório.<br>";
+                if (!document.getElementById('purchasedAt').value) {
+                    errorMsg += '"Aquisição" é um campo obrigatório.<br>'
                 }
-                if (!document.getElementById("purchasedAt").value) {
-                    error_msg += "Comprado a é um campo obrigatório.<br>";
+                if (!document.getElementById('type').value) {
+                    errorMsg += '"Tipo" é um campo obrigatório.<br>'
                 }
-                if (!document.getElementById("type").value) {
-                    error_msg += "Tipo é um campo obrigatório.<br>";
-                }
-                if (error_msg) {
-                    Swal.showValidationMessage(error_msg);
-                }
+                if (errorMsg) Swal.showValidationMessage(errorMsg)
                 return [
                     document.getElementById("name").value,
                     document.getElementById("description").value,
@@ -410,19 +396,14 @@ function createItem() {
                 ];
             },
         });
-
-        // se não tem erros no preenchimento chama o serviço de validação
-        if (formLogin) {
+        if (createItem) {
             objItem = {
-                name: formLogin[0],
-                description: formLogin[1],
-                purchasedAt: formLogin[2],
-                typeId: formLogin[3],
-
-
+                name: createItem[0],
+                description: createItem[1],
+                purchasedAt: createItem[2],
+                typeId: createItem[3]
             };
             const json = JSON.stringify(objItem);
-            const token=getCookie('login')
             $.ajax({
                 url: linkUrl + "/item/new/",
                 type: "post",
@@ -432,31 +413,34 @@ function createItem() {
                 beforeSend: function (xhr) { xhr.setRequestHeader('x-access-token', token)},
                 success: function (result) {
                     Swal.fire({
-                        icon: "success",
-                        title: "Criado com sucesso.",
+                        icon: 'success',
+                        title: result.message,
                         showConfirmButton: false,
                         timer: 1500,
                     }).then(function () {
                         getAllItens();
                     });
-
                 },
                 error: function (err) {
-                    exit = err;
+                    msg = JSON.parse(err.responseText);
+                    Swal.fire({
+                        icon: 'error',
+                        text: msg.message,
+                        confirmButtonColor: '#212529',
+                    })
                 }
             });
-
         }
     })();
-    getAllItens();
 }
 
 function newInspection(v_id) {
     (async () => {
-        const { value: formLogin } = await Swal.fire({
-            title: "Inspecção do material",
+        const { value: newInspection } = await Swal.fire({
+            title: "Inspecção do item",
             showCancelButton: true,
             confirmButtonText: "Criar",
+            confirmButtonColor: '#212529',
             cancelButtonText: "Cancelar",
             showLoaderOnConfirm: true,
             allowOutsideClick: true,
@@ -474,7 +458,7 @@ function newInspection(v_id) {
             preConfirm: () => {
                 var error_msg = "";
                 if (!document.getElementById("description").value) {
-                    error_msg += "Descrição é um campo obrigatório.<br>";
+                    error_msg += `"Descrição" é um campo obrigatório.<br>`
                 }
                 if (error_msg) {
                     Swal.showValidationMessage(error_msg);
@@ -485,11 +469,9 @@ function newInspection(v_id) {
                 ];
             },
         });
-
-        // se não tem erros no preenchimento chama o serviço de validação
-        if (formLogin) {
+        if (newInspection) {
             objItem = {
-                description: formLogin[0],
+                description: newInspection[0],
             };
             const json = JSON.stringify(objItem);
             const token=getCookie('login')
@@ -513,7 +495,12 @@ function newInspection(v_id) {
 
                 },
                 error: function (err) {
-                    exit = err;
+                    msg = JSON.parse(err.responseText);
+                    Swal.fire({
+                        icon: 'error',
+                        text: msg.message,
+                        confirmButtonColor: '#212529',
+                    })
                 }
             });
 
@@ -533,21 +520,23 @@ function viewInspection(v_id) {
             data = data.data;
             if (data.length > 0) {
                 for (i in data) {
-                    table += '<tr class="d-flex"><td class="col-9">' + data[i].description + '</td>'+
-                    '<td class="col-3">' + data[i].createdAt.substr(0, 10) + '</td></tr>';
+                    table += '<tr class="d-flex"><td class="col-9 text-start">' + data[i].description + '</td>'+
+                    '<td class="col-3 align-middle">' + data[i].createdAt.substr(0, 10) + '</td></tr>';
                 }
             }
             (async () => {
                 const { value: formLogin } = await Swal.fire({
                     title: "Histórico de Inspecções",
-                    confirmButtonText: "OK",
+                    showConfirmButton: false,
+                    showCloseButton: true,
+                    focusClose: false,
                     showLoaderOnConfirm: true,
                     allowOutsideClick: true,
                     allowEnterKey: true,
                     html:
-                        '<table class="table table-hover align-middle" id="itens">' +
+                        '<table class="table table-hover align-middle fs-7" id="itens">' +
                         '<tr class="d-flex">' +
-                        '<th class="col-9">Descrição</th>' +
+                        '<th class="col-9 text-start">Descrição</th>' +
                         '<th class="col-3">Data</th>' +
                         '</tr>' +
                         table +
@@ -557,12 +546,11 @@ function viewInspection(v_id) {
         },
         error: function (err) {
             msg = JSON.parse(err.responseText);
-            Swal.fire(
-                'Aviso!',
-                msg.message,
-                'warning'
-            );
-            exit = err;
+            Swal.fire({
+                icon: 'info',
+                text: msg.message,
+                confirmButtonColor: '#212529',
+            })
         }
     })
 }

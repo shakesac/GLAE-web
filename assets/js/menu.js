@@ -107,9 +107,6 @@ function getUserMenu() {
             '</button>'+
             '<div class="collapse navbar-collapse" id="navbarCollapse">'+
                 '<ul class="navbar-nav me-auto mb-2 mb-md-0">'+
-                    '<li class="nav-item">'+
-                        '<a class="nav-link text-white" href="/users/index.html">Inicio</a>'+
-                    '</li>'+
                     '<li class="nav-item">' +
                         '<a class="nav-link" href="/users/newLease.html">Solicitar emprestimo</a>'+
                     '</li>'+

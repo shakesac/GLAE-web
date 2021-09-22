@@ -1,13 +1,8 @@
-
-// Chama o serviço que devolve todos as categorias do utilizador
-function getAllTypes() {
-    let category = document.getElementById("category").value;
+function getAllTypes(category) {
     (async () => {
-        if (category == "") {
-            searchUrl = "/item/type/all";
-        } else {
-            searchUrl = "/item/type/all?category=" + category;
-        }
+        let searchUrl = ''
+        if (category) searchUrl = "/item/type/all?category=" + category
+        else searchUrl = '/item/type/all'
         const token = getCookie('login')
         await $.ajax({
             url: linkUrl + searchUrl,
@@ -48,7 +43,7 @@ function getAllTypes() {
             error: function (err) {
                 document.getElementById('types').innerHTML = '<div class="alert alert-danger" role="alert">' +
                     err.responseJSON.message +
-                    '</div>';
+                    '</div>'
                 exit = err;
             }
         })
@@ -77,7 +72,7 @@ function editType(v_id) {
             beforeSend: function (xhr) { xhr.setRequestHeader('x-access-token', token)},
             success: function (data) {
                 msg = data.message
-                select = '<select id="cat" class="form-select" disabled><option value="">Categoria</option>';
+                select = '<select id="cat" class="form-select"><option value="">Categoria</option>';
                 data = data.data;
                 if (data.length > 0) {
                     for (i in data) {
@@ -91,46 +86,46 @@ function editType(v_id) {
                 select += '</select>'
             },
         })
-        const form = await Swal.fire({
-            title: "Editar tipo",
+        const {value: editType} = await Swal.fire({
+            title: "Editar tipo de material",
             showCancelButton: true,
             confirmButtonText: "Guardar",
+            confirmButtonColor: '#212529',
             cancelButtonText: "Cancelar",
             showLoaderOnConfirm: true,
             allowOutsideClick: true,
             allowEnterKey: true,
             html:
-                '<form id="typeForm">' +
-                '<p style="font-size: 50px">' +
-                '<i class="bi bi-pencil-square"></i></p>' +
-                '<div class="container">' +
-                '<div class="input-group input-group-sm mb-3">' +
-                '<span class="input-group-text">Nome</span>' +
-                '<input type="text" id="type" class="form-control" maxlength="100" value="' + type + '" required>' +
-                '</div>' +
-                '<div class="input-group input-group-sm mb-3">' +
-                '<span class="input-group-text">Código</span>' +
-                '<input type="number" id="code" class="form-control" min="0" max="9" value="' + code + '" required>' +
-                '<span class="input-group-text">Categoria</span>' +
-                select +
-                '</div>' +
-                '</div>',
+            '<form id="typeForm">' +
+            '<p style="font-size: 50px">' +
+            '<i class="bi bi-pencil-square"></i></p>' +
+            '<div class="container">' +
+            '<div class="input-group input-group-sm mb-3">' +
+            '<span class="input-group-text">Nome</span>' +
+            `<input type="text" id="type" class="form-control" maxlength="100" value='${type}' required>` +
+            '</div>' +
+            '<div class="input-group input-group-sm mb-3">' +
+            '<span class="input-group-text">Código</span>' +
+            `<input type="number" id="code" class="form-control" min="0" max="99" value='${code}' required>` +
+            '</div>' +
+            '<div class="input-group input-group-sm mb-3">' +
+            '<span class="input-group-text">Categoria</span>' +
+            select +
+            '</div>' +
+            '</div>',
 
             preConfirm: () => {
-                let error_msg = "";
-                if (!document.getElementById("type").value) {
-                    error_msg += "O nome do tipo não pode ficar em branco.<br>";
+                let errorMsg = ''
+                if (!document.getElementById('type').value) {
+                    errorMsg += '"Nome" é um campo obrigatório.<br>'
                 }
-                if (!document.getElementById("code").value) {
-                    error_msg += "O código não pode ficar em branco.<br>";
+                if (!document.getElementById('code').value) {
+                    errorMsg += '"Código" é um campo obrigatório.<br>'
                 }
-                if (!document.getElementById("cat").value) {
-                    alert(document.getElementById("cat").value);
-                    error_msg += "Tem de escolher uma categoria.<br>";
+                if (!document.getElementById('cat').value) {
+                    errorMsg += '"Categoria" é um campo obrigatório.'
                 }
-                if (error_msg) {
-                    Swal.showValidationMessage(error_msg);
-                }
+                if (errorMsg) Swal.showValidationMessage(errorMsg)
                 return [
                     document.getElementById("type").value,
                     document.getElementById("code").value,
@@ -138,14 +133,12 @@ function editType(v_id) {
                 ];
             },
         });
-        // se não tem erros no preenchimento chama o serviço de validação
-        if (form) {
+        if (editType) {
             objCategory = {
-                type: form[0],
-                code: form[1],
-                categoryId: form[2],
+                type: editType[0],
+                code: editType[1],
+                categoryId: editType[2],
             };
-            console.log(objCategory);
             const json = JSON.stringify(objCategory);
             $.ajax({
                 url: linkUrl + "/item/type/" + v_id,
@@ -155,7 +148,6 @@ function editType(v_id) {
                 dataType: "json",
                 beforeSend: function (xhr) { xhr.setRequestHeader('x-access-token', token)},
                 success: function (result) {
-                    //document.cookie = "userId=" + result;
                     Swal.fire({
                         icon: "success",
                         title: result.message,
@@ -168,14 +160,11 @@ function editType(v_id) {
                 },
                 error: function (err) {
                     msg = JSON.parse(err.responseText);
-                    Swal.fire(
-                        'Erro!',
-                        msg.message,
-                        'error'
-                    ).then(function () {
-                        getAllTypes();
-                    });
-                    exit = err;
+                    Swal.fire({
+                        icon: 'error',
+                        text: msg.message,
+                        confirmButtonColor: '#212529',
+                    })
                 }
             });
 
@@ -204,10 +193,11 @@ function createType() {
                 select += '</select>'
             },
         })
-        const form = await Swal.fire({
-            title: "Tipo de material",
+        const {value: createType} = await Swal.fire({
+            title: "Novo tipo de material",
             showCancelButton: true,
             confirmButtonText: "Criar",
+            confirmButtonColor: '#212529',
             cancelButtonText: "Cancelar",
             showLoaderOnConfirm: true,
             allowOutsideClick: true,
@@ -223,7 +213,7 @@ function createType() {
                 '</div>' +
                 '<div class="input-group input-group-sm mb-3">' +
                 '<span class="input-group-text">Código</span>' +
-                '<input type="number" id="code" class="form-control" min="0" max="9" required>' +
+                '<input type="number" id="code" class="form-control" min="0" max="99" required>' +
                 '</div>' +
                 '<div class="input-group input-group-sm mb-3">' +
                 '<span class="input-group-text">Categoria</span>' +
@@ -231,33 +221,30 @@ function createType() {
                 '</div>' +
                 '</div>',
             preConfirm: () => {
-                let error_msg = "";
-                if (!document.getElementById("type").value) {
-                    error_msg += "O nome do tipo não pode ficar em branco.<br>";
+                let errorMsg = ''
+                if (!document.getElementById('type').value) {
+                    errorMsg += '"Nome" é um campo obrigatório.<br>'
                 }
-                if (!document.getElementById("code").value) {
-                    error_msg += "O código não pode ficar em branco.<br>";
+                if (!document.getElementById('code').value) {
+                    errorMsg += '"Código" é um campo obrigatório.<br>'
                 }
-                if (!document.getElementById("cat").value) {
-                    error_msg += "Tem de escolher uma categoria.<br>";
+                if (!document.getElementById('cat').value) {
+                    errorMsg += '"Categoria" é um campo obrigatório.'
                 }
-                if (error_msg) {
-                    Swal.showValidationMessage(error_msg);
-                }
+                if (errorMsg) Swal.showValidationMessage(errorMsg)
                 return [
                     document.getElementById("type").value,
                     document.getElementById("code").value,
                     document.getElementById("cat").value,
                 ];
             },
-        });
-        // se não tem erros no preenchimento chama o serviço de validação
-        if (form) {
+        })
+        if (createType) {
             objCategory = {
-                type: form[0],
-                code: form[1],
-                categoryId: form[2],
-            };
+                type: createType[0],
+                code: createType[1],
+                categoryId: createType[2],
+            }
             const json = JSON.stringify(objCategory);
             $.ajax({
                 url: linkUrl + "/item/type/new",
@@ -275,21 +262,16 @@ function createType() {
                     }).then(function () {
                         getAllTypes();
                     });
-
                 },
                 error: function (err) {
                     msg = JSON.parse(err.responseText);
-                    Swal.fire(
-                        'Erro!',
-                        msg.message,
-                        'error'
-                    ).then(function () {
-                        getAllCategorys();
-                    });
-                    exit = err;
+                    Swal.fire({
+                        icon: 'error',
+                        text: msg.message,
+                        confirmButtonColor: '#212529',
+                    })
                 }
             });
-
         }
     })();
 }
@@ -297,36 +279,40 @@ function createType() {
 function delType(v_id) {
     (async () => {
         const token = getCookie('login')
-        const form = await Swal.fire({
+        const delType = await Swal.fire({
             title: 'Tem a certeza?',
-            text: "Esta acção é irreversível!",
-            icon: 'warning',
+            text: "Esta acção é irreversível.",
+            icon: 'question',
             showCancelButton: true,
-            cancelButtonColor: '#3085d6',
             confirmButtonColor: '#d33',
-            confirmButtonText: 'Sim, eliminar'
+            confirmButtonText: 'Eliminar',
+            confirmButtonColor: '#d33',
+            cancelButtonText: "Cancelar",
         })
-
-        if (form) {
+        if (delType.isConfirmed) {
             $.ajax({
                 url: linkUrl + "/item/type/" + v_id,
                 type: "DELETE",
                 beforeSend: function (xhr) { xhr.setRequestHeader('x-access-token', token)},
                 success: function (result) {
-                    Swal.fire(
-                        'Eliminado.',
-                        result.message,
-                        'success'
-                    ).then(function () {
+                    Swal.fire({                        
+                        icon: 'success',
+                        title: result.message,
+                        timer: 1500,
+                        showConfirmButton: false,
+                    }).then(function () {
                         getAllTypes();
                     });
-
                 },
                 error: function (err) {
-                    alert(err.statusText);
-                    exit = err;
+                    msg = JSON.parse(err.responseText);
+                    Swal.fire({
+                        icon: 'error',
+                        text: msg.message,
+                        confirmButtonColor: '#212529',
+                    })
                 }
-            });
+            })
         }
     })();
 }
@@ -356,6 +342,11 @@ function getCategory() {
     })();
 }
 
-function changeCategory() {
-    getAllTypes();
+function setSelect(category) {
+    const select = document.getElementById('category')
+    select.value = category
+}
+
+function changeType(category) {
+    getAllTypes(category);
 }

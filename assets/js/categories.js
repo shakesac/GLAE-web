@@ -1,8 +1,6 @@
-
-// Chama o serviço que devolve todos as categorias do utilizador
 function getAllCategorys() {
     (async () => {
-        const token=getCookie("login")
+        const token=getCookie('login')
         await $.ajax({
             url: linkUrl + "/item/category/all",
             type: "GET",
@@ -24,7 +22,7 @@ function getAllCategorys() {
                         auxTable += '<tr class="d-flex">' +
                             '<td class="col-1 text-center"> ' + data[i].code + '</td>' +
                             '<td class="col-9">' + data[i].category + '</td>' +
-                            '<td class="col-1 text-end"><button type="button" title="Ver tipos" class="btn btn-sm btn-outline-info"><i class="bi bi-list"></i></button></td>' +
+                            `<td class="col-1 text-end"><button onclick="window.location.href='/admin/subsections.html?section=${data[i].id}'" type="button" title="Ver tipos" class="btn btn-sm btn-outline-info"><i class="bi bi-list"></i></button></td>` +
                             '</div></td><td class="col-1 text-end"><div class="btn-group" role="group" aria-label="action">' +
                             '<a href="javascript:editCategory(' + data[i].id + ');" title="Editar"><button type="button" class="btn btn-sm btn-outline-secondary me-1"><i class="bi bi-pencil-square"></i></button></a>' +
                             '<a href="javascript:delCategory(' + data[i].id + ');" title="Eliminar"><button type="button" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button></a>' +
@@ -64,8 +62,9 @@ function editCategory(v_id) {
         const { value: form } = await Swal.fire({
             title: "Editar categoria",
             showCancelButton: true,
-            confirmButtonText: "Save",
-            cancelButtonText: "Cancel",
+            confirmButtonText: "Guardar",
+            confirmButtonColor: '#212529',
+            cancelButtonText: "Cancelar",
             showLoaderOnConfirm: true,
             allowOutsideClick: true,
             allowEnterKey: true,
@@ -84,23 +83,20 @@ function editCategory(v_id) {
                 '</div>' +
                 '</div>',
             preConfirm: () => {
-                let error_msg = "";
-                if (!document.getElementById("category").value) {
-                    error_msg += "O nome da categoria não pode ficar em branco.<br>";
+                let errorMsg = ''
+                if (!document.getElementById('category').value) {
+                    errorMsg += '"Nome" é um campo obrigatório.<br>'
                 }
-                if (!document.getElementById("code").value) {
-                    error_msg += "O código da categoria não pode ficar em branco.<br>";
+                if (!document.getElementById('code').value) {
+                    errorMsg += '"Código" é um campo obrigatório.'
                 }
-                if (error_msg) {
-                    Swal.showValidationMessage(error_msg);
-                }
+                if (errorMsg) Swal.showValidationMessage(errorMsg)
                 return [
                     document.getElementById("category").value,
                     document.getElementById("code").value,
                 ];
             },
         });
-        // se não tem erros no preenchimento chama o serviço de validação
         if (form) {
             objCategory = {
                 category: form[0],
@@ -116,7 +112,6 @@ function editCategory(v_id) {
                 dataType: "json",
                 beforeSend: function (xhr) { xhr.setRequestHeader('x-access-token', token)},
                 success: function (result) {
-                    //document.cookie = "userId=" + result;
                     Swal.fire({
                         icon: "success",
                         title: result.message,
@@ -125,21 +120,17 @@ function editCategory(v_id) {
                     }).then(function () {
                         getAllCategorys();
                     });
-
                 },
                 error: function (err) {
                     msg = JSON.parse(err.responseText);
-                    Swal.fire(
-                        'Erro!',
-                        msg.message,
-                        'error'
-                    ).then(function () {
-                        getAllCategorys();
-                    });
+                    Swal.fire({
+                        icon: 'error',
+                        text: msg.message,
+                        confirmButtonColor: '#212529',
+                    })
                     exit = err;
                 }
             });
-
         }
     })();
 }
@@ -148,10 +139,11 @@ function createCategory() {
     (async () => {
         var category = "";
         const { value: form } = await Swal.fire({
-            title: "Category",
+            title: "Nova categoria",
             showCancelButton: true,
-            confirmButtonText: "Create",
-            cancelButtonText: "Cancel",
+            confirmButtonText: "Criar",
+            confirmButtonColor: '#212529',
+            cancelButtonText: "Cancelar",
             showLoaderOnConfirm: true,
             allowOutsideClick: true,
             allowEnterKey: true,
@@ -170,23 +162,20 @@ function createCategory() {
                 '</div>' +
                 '</div>',
             preConfirm: () => {
-                let error_msg = "";
-                if (!document.getElementById("category").value) {
-                    error_msg += "O nome da categoria não pode ficar em branco.<br>";
+                let errorMsg = ''
+                if (!document.getElementById('category').value) {
+                    errorMsg += '"Nome" é um campo obrigatório.<br>'
                 }
-                if (!document.getElementById("code").value) {
-                    error_msg += "O código da categoria não pode ficar em branco.<br>";
+                if (!document.getElementById('code').value) {
+                    errorMsg += '"Código" é um campo obrigatório.'
                 }
-                if (error_msg) {
-                    Swal.showValidationMessage(error_msg);
-                }
+                if (errorMsg) Swal.showValidationMessage(errorMsg)
                 return [
                     document.getElementById("category").value,
                     document.getElementById("code").value,
                 ];
             },
         });
-        // se não tem erros no preenchimento chama o serviço de validação
         if (form) {
             objCategory = {
                 category: form[0],
@@ -211,56 +200,56 @@ function createCategory() {
                     }).then(function () {
                         getAllCategorys();
                     });
-
                 },
                 error: function (err) {
                     msg = JSON.parse(err.responseText);
-                    Swal.fire(
-                        'Erro!',
-                        msg.message,
-                        'error'
-                    ).then(function () {
-                        getAllCategorys();
-                    });
+                    Swal.fire({
+                        icon: 'error',
+                        text: msg.message,
+                        confirmButtonColor: '#212529',
+                    })
                     exit = err;
                 }
             });
-
         }
     })();
 }
 
 function delCategory(v_id) {
     (async () => {
-        var category = "";
-        const { value: form } = await Swal.fire({
+        const deleteCategory = await Swal.fire({
             title: 'Tem a certeza?',
-            text: "Esta acção é irreversível!",
-            icon: 'warning',
+            text: "Esta acção é irreversível.",
+            icon: 'question',
             showCancelButton: true,
-            cancelButtonText: 'Cancelar',
-            cancelButtonColor: '#3085d6',
             confirmButtonColor: '#d33',
-            confirmButtonText: 'Sim, eliminar'
-        });
-        if (form) {
+            confirmButtonText: 'Eliminar',
+            confirmButtonColor: '#d33',
+            cancelButtonText: "Cancelar",
+        })
+        if (deleteCategory.isConfirmed) {
+            const token = getCookie('login')
             $.ajax({
                 url: linkUrl + "/item/category/" + v_id,
                 type: "DELETE",
                 beforeSend: function (xhr) { xhr.setRequestHeader('x-access-token', token)},
                 success: function (result) {
-                    Swal.fire(
-                        'Eliminado.',
-                        result.message,
-                        'success'
-                    ).then(function () {
-                        getAllCategorys();
-                    });
-
+                    Swal.fire({                        
+                        icon: 'success',
+                        title: result.message,
+                        timer: 1500,
+                        showConfirmButton: false,
+                    }).then(function () {
+                        getAllCategorys()
+                    })
                 },
                 error: function (err) {
-                    alert(err.statusText);
-                    exit = err;
+                    msg = JSON.parse(err.responseText);
+                    Swal.fire({
+                        icon: 'error',
+                        text: msg.message,
+                        confirmButtonColor: '#212529',
+                    })
                 }
             });
         }

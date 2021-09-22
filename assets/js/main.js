@@ -18,7 +18,6 @@ function getCookie(cname) {
 
 
 function haveLogin() {
-
     var path = window.location.pathname;
     var page = path.split("/").pop();
     if ((page != 'login.html') && (page != 'signup.html')) {
@@ -33,16 +32,15 @@ function haveLogin() {
                     if ((result.data.roleId != 1) && (path.split("/")[1] == 'admin')) {
                         window.location = "/users/index.html"
                     }
-
                 },
                 error: function (err) {
                     msg = JSON.parse(err.responseText);
-                    Swal.fire(
-                        'Erro!',
-                        msg.message,
-                        'error',
-                        1500
-                    ).then(function () {
+                    Swal.fire({
+                        icon: 'error',
+                        text: msg.message,
+                        confirmButtonColor: '#212529',
+                        timer: 1500
+                    }).then(function () {
                         window.location = "/login.html";
                     });
                     $(".swal2-container").css('background-color', '#000');

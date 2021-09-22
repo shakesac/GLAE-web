@@ -1,1 +1,2 @@
 Header set X-Content-Type-Options "nosniff"
+DirectoryIndex home.html
