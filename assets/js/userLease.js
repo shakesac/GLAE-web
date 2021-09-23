@@ -76,10 +76,14 @@ function getAllItens() {
                             '</tr>';
                         for (i in data) {
                             if (!bag.includes(data[i].id)) {
+                                console.log(data[i])
+                                let type
+                                if (!data[i].item_type) type = data[i].type
+                                else type = data[i].item_type.type
                                 auxTable += '<tr class="d-flex">' +
                                     '<td class="col-2">' + data[i].name + '</td>' +
                                     '<td class="col-6 text-start">' + data[i].description + '</td>'
-                                auxTable += '<td class="col-2"> ' + data[i].item_type.type + '</td>' +
+                                auxTable += '<td class="col-2"> ' + type + '</td>' +
                                     '<td class="col-1 text-end"><div class="btn-group" role="group" aria-label="inspection">' +
                                     '<a href="javascript:addItem(' + data[i].id + ', `' + data[i].name + '`);" title="Adicionar ao cesto"><button type="button" class="btn btn-sm round-btn btn-outline-success"><i class="bi bi-plus-lg"></i></button></a>' +
                                     '</div></td>'
@@ -236,8 +240,9 @@ function removeItem(v_id) {
     (async () => {
         const { value: form } = await Swal.fire({
             text: 'Tem a certeza que quer remover este item do carrinho?',
-            icon: 'warning',
+            icon: 'question',
             showCancelButton: true,
+            cancelButtonText: 'Cancelar',
             cancelButtonColor: '#3085d6',
             confirmButtonColor: '#d33',
             confirmButtonText: 'Remover'
@@ -248,7 +253,8 @@ function removeItem(v_id) {
             Swal.fire({
                 text: 'Item removido do carrinho.',
                 icon: 'success',
-                timer: 1000
+                timer: 1000,
+                showConfirmButton: false,
             }).then(function () {
                 removeArray(bag, v_id);
                 document.cookie = "bag=" + JSON.stringify(bag)

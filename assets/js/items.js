@@ -279,12 +279,13 @@ function delItem(v_id) {
     (async () => {
         const { value: form } = await Swal.fire({
             title: 'Tem a certeza?',
-            text: "Esta operação não é reversivél!",
-            icon: 'warning',
+            text: "Esta acção é irreversível.",
+            icon: 'question',
             showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Sim, eliminar!'
+            confirmButtonColor: '#d33',
+            confirmButtonText: 'Eliminar',
+            confirmButtonColor: '#d33',
+            cancelButtonText: "Cancelar",
         });
         const token=getCookie('login')
         if (form) {
@@ -293,24 +294,22 @@ function delItem(v_id) {
                 type: "DELETE",
                 beforeSend: function (xhr) { xhr.setRequestHeader('x-access-token', token)},
                 success: function (result) {
-                    Swal.fire(
-                        'Eliminar!',
-                        'Material eliminado com sucesso.',
-                        'success'
-                    ).then(function () {
+                    Swal.fire({                        
+                        icon: 'success',
+                        title: result.message,
+                        timer: 1500,
+                        showConfirmButton: false,
+                    }).then(function () {
                         getAllItens();
                     });
                 },
                 error: function (err) {
                     msg = JSON.parse(err.responseText);
-                    Swal.fire(
-                        'Erro!',
-                        msg.message,
-                        'error'
-                    ).then(function () {
-                        getAllItens();
-                    });
-                    exit = err;
+                    Swal.fire({
+                        icon: 'error',
+                        text: msg.message,
+                        confirmButtonColor: '#212529',
+                    })
                 }
             });
         }

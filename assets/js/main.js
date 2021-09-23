@@ -1,4 +1,4 @@
-var linkUrl = "http://213.30.2.186:5000/api/v1";
+var linkUrl = "http://127.0.0.1:5000/api/v1";
 haveLogin();
 
 function getCookie(cname) {
