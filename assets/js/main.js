@@ -30,7 +30,7 @@ function haveLogin() {
                 beforeSend: function (xhr) { xhr.setRequestHeader('x-access-token', token); },
                 success: function (result) {
                     if ((result.data.roleId != 1) && (path.split("/")[1] == 'admin')) {
-                        window.location = "/users/index.html"
+                        window.location = "/users/leases.html"
                     }
                 },
                 error: function (err) {
