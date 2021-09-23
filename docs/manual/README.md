@@ -73,7 +73,7 @@ Para criar um cargo bastará atribuir-lhe um nome.
 * Qualquer cargo é passivel de ser alterado ou eliminado.
 * Os utilizadores que tinham um cargo eliminado atribuído passaram a ter a informação *Sem cargo* na listagem.
 
-### :package: Material
+### 
 
 
 
