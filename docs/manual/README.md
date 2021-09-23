@@ -64,6 +64,16 @@ O código de grupo apresentado na lista será 11.
 
 
 ### Cargos
+A gestão de cargos é feita nesta página. Esta funcionalidade serve para atribuir cargos ou responsabilidades do agrupamento aos utilizadores. O cargo associado aos utilizadores será apresentado na página de listagem dos utilizadores existentes.
+
+#### Criação e edição
+Para criar um cargo bastará atribuir-lhe um nome.
+
+#### Acções e restrições
+* Qualquer cargo é passivel de ser alterado ou eliminado.
+* Os utilizadores que tinham um cargo eliminado atribuído passaram a ter a informação *Sem cargo* na listagem.
+
+### Material
 
 
 
