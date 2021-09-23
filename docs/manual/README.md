@@ -2,11 +2,11 @@
 
 ## Indice
 * ### Primeiro arranque
-    * [Registo e Inicio de Sessão][2]
+    * [Registo e Inicio de Sessão][README.md#registo-e-inicio-de-sessão]
 * ### Administração
-    * [Utilizadores][utilizadores]
-    * [Secções e grupos][#secções-e-grupos]
-    * [Cargos][#cargos]
+    * [Utilizadores][README.md#utilizadores]
+    * [Secções e grupos][README.md#secções-e-grupos]
+    * [Cargos][README.md#cargos]
     * [Material][#material]
     * [Categorias e tipos][7]
     * [Emprestimos][8]
