@@ -22,7 +22,7 @@ function getAllCategorys() {
                         auxTable += '<tr class="d-flex">' +
                             '<td class="col-1 text-center"> ' + data[i].code + '</td>' +
                             '<td class="col-9">' + data[i].category + '</td>' +
-                            `<td class="col-1 text-end"><button onclick="window.location.href='/admin/subsections.html?section=${data[i].id}'" type="button" title="Ver tipos" class="btn btn-sm btn-outline-info"><i class="bi bi-list"></i></button></td>` +
+                            `<td class="col-1 text-end"><button onclick="window.location.href='/admin/types.html?category=${data[i].id}'" type="button" title="Ver tipos" class="btn btn-sm btn-outline-info"><i class="bi bi-list"></i></button></td>` +
                             '</div></td><td class="col-1 text-end"><div class="btn-group" role="group" aria-label="action">' +
                             '<a href="javascript:editCategory(' + data[i].id + ');" title="Editar"><button type="button" class="btn btn-sm btn-outline-secondary me-1"><i class="bi bi-pencil-square"></i></button></a>' +
                             '<a href="javascript:delCategory(' + data[i].id + ');" title="Eliminar"><button type="button" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button></a>' +

@@ -8,7 +8,7 @@
     * [Secções e grupos](#secções-e-grupos)
     * [Cargos](#cargos)
     * [Material](#material)
-    * [Categorias e tipos][7]
+    * [Categorias e tipos][#categorias-e-tipos-de-material]
     * [Emprestimos][8]
 * ### Utilizador
     * [Pedir emprestimo][9]
@@ -73,7 +73,31 @@ Para criar um cargo bastará atribuir-lhe um nome.
 * Qualquer cargo é passivel de ser alterado ou eliminado.
 * Os utilizadores que tinham um cargo eliminado atribuído passaram a ter a informação *Sem cargo* na listagem.
 
-### 
+### Material
+Nesta página é feita a gestão do material.
+Por defeito, ao abrir a página são apresentados todos os artigos activos. Os resultados podem ser filtrados pela categoria a que pertencem.
+
+É possível consultar todos os artigos em fim de vida arquivados através do switch ![Mostrar arquivados](imgs/endOfLife.png). Esta lista serve para efeitos de arquivo de forma a poder-se identificar artigos que já não existem no histórico de emprestimos.
+
+#### :pencil2: Criação e edição
+Ao criar um novo artigo é solicitado:
+* Nome - obrigatório
+* Descrição
+* Data de compra do artigo - obrigatório
+* Grupo responsável pelo artigo - obrigatório
+* Categoria - obrigatório
+* Tipo de material
+
+Todos estes campos podem ser editados.
+
+#### :heavy_check_mark::no_entry: Acções e restrições
+* Podem ser criadas ou consultadas inspecções em qualquer artigo através dos botões ![Inspecções](imgs/inspeccoes.png). A data associada à inspecção será a data do momento em que a mesma é realizada.
+* Qualquer artigo é passivel de ser alterado a qualquer momento desde que não esteja arquivado.
+* Um artigo apenas poderá ser eliminado caso não esteja associado a nenhum emprestimo.
+* Qualquer artigo poderá ser arquivado a qualquer momento, mesmo durante um emprestimo através do botão ![](imgs/botaoarquivar.png). O mesmo não voltará a aparecer nos resultados na página de novos pedidos de emprestimo do utilizador.
+
+
+### Categorias e Tipos de material
 
 
 
