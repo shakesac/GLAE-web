@@ -56,7 +56,7 @@ function getAllItens() {
                         if (!data[i].subsection || !data[i].code) code = 'N/D'
                         else {
                             data[i].code = (data[i].code).toLocaleString(undefined, {minimumIntegerDigits: 2, useGrouping:false})
-                            code = data[i].subsection.code + ''+ data[i].subsection.section.code +'.'+ data[i].item_type.item_category.code +''+ data[i].code
+                            code = data[i].subsection.section.code+''+data[i].subsection.code+'.'+ data[i].item_type.item_category.code +''+ data[i].code
                         }
                         if (!data[i].description) description = '<i class="text-muted">Sem descrição</i>'
                         else description = data[i].description
