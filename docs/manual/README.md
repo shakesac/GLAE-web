@@ -3,7 +3,7 @@
 ## :bookmark: Índice
 * ### Primeiro arranque & Autenticação
     * [Registo e Inicio de Sessão](#registo-e-inicio-de-sessão)
-    * [Terminar sessão](#terminar-sessao)
+    * [Terminar sessão](#terminar-sessão)
 * ### Administração
     * [Utilizadores](#utilizadores)
     * [Secções e grupos](#secções-e-grupos)
