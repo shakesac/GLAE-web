@@ -1,8 +1,8 @@
 # :microscope: Lab. de Projecto - GLAE - Frontend Web
 
-### Implementação
+### [Manual de Utilizador](manual/README.md)
+ ------
 
-
-### Manual de Utilizador
-* [Manual de Utilizador](manual/README.md)
-
+## Implementação
+### Requisitos
+* Servidor Web. (Apache, Nginx, httpd, etc)
