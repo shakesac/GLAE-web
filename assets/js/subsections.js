@@ -22,9 +22,10 @@ function getAllSubsections(section) {
                         '<th class="col-1"></th>' +
                         '</tr>';
                     for (i in data) {
+                        let fullCode = data[i].section.code + '' +data[i].code
                         num += 1
                         auxTable += '<tr class="d-flex">' +
-                            '<td class="col-1 text-center"> ' + data[i].fullCode + '</td>' +
+                            '<td class="col-1 text-center"> ' + fullCode + '</td>' +
                             '<td class="col-8"> ' + data[i].subsection + '</td>' +
                             '<td class="col-2"> ' + data[i].section.section + '</td>' +
                             '</div></td><td class="col-1 text-end"><div class="btn-group" role="group" aria-label="action">' +

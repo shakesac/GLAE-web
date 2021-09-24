@@ -43,24 +43,35 @@ function getAllItens() {
                 if (data.length > 0) {
                     auxTable = '<table class="table table-hover align-middle" id="itens">' +
                         '<tr class="d-flex">' +
+                        '<th class="col-1 text-center">Cód.</th>' +
                         '<th class="col-2">Nome</th>' +
                         '<th class="col-4">Descrição</th>' +
-                        '<th class="col-2">Aquisição</th>' +
-                        '<th class="col-2">Tipo</th>' +
+                        '<th class="col-1">Aquisição</th>' +
+                        '<th class="col-1">Tipo</th>' +
                         '<th class="col-1 text-center">Inspecções</th>' +
-                        '<th class="col-1"></th>' +
+                        '<th class="col-2"></th>' +
                         '</tr>';
                     for (i in data) {
+                        let code, description
+                        if (!data[i].subsection || !data[i].code) code = 'N/D'
+                        else {
+                            data[i].code = (data[i].code).toLocaleString(undefined, {minimumIntegerDigits: 2, useGrouping:false})
+                            code = data[i].subsection.code + ''+ data[i].subsection.section.code +'.'+ data[i].item_type.item_category.code +''+ data[i].code
+                        }
+                        if (!data[i].description) description = '<i class="text-muted">Sem descrição</i>'
+                        else description = data[i].description
                         auxTable += '<tr class="d-flex">' +
+                            '<td class="col-1 fs-7 text-center">' + code + '</td>' +
                             '<td class="col-2">' + data[i].name + '</td>' +
-                            '<td class="col-4">' + data[i].description + '</td>' +
-                            '<td class="col-2"> ' + data[i].purchasedAt + '</td>';
-                        auxTable += '<td class="col-2"> ' + data[i].item_type.type + '</td>' +
+                            '<td class="col-4">' + description + '</td>' +
+                            '<td class="col-1 fs-7"> ' + data[i].purchasedAt + '</td>';
+                        auxTable += '<td class="col-1"> ' + data[i].item_type.type + '</td>' +
                             '<td class="col-1 text-end"><div class="btn-group" role="group" aria-label="inspection">' +
                             '<a href="javascript:newInspection(' + data[i].id + ');" title="Nova inspecção"><button type="button" class="btn btn-sm btn-outline-info me-1"><i class="bi bi-file-earmark-plus"></i></button></a>' +
                             '<a href="javascript:viewInspection(' + data[i].id + ');" title="Ver inspecções"><button type="button" class="btn btn-sm btn-outline-info"><i class="bi bi-file-text"></i></button></a>' +
-                            '</div></td><td class="col-1 text-end"><div class="btn-group" role="group" aria-label="action">' +
-                            '<a href="javascript:editItem(' + data[i].id + ');" title="Editar"><button type="button" class="btn btn-sm btn-outline-secondary me-1"><i class="bi bi-pencil-square"></i></button></a>' +
+                            '</div></td><td class="col-2 text-end"><div class="btn-group" role="group" aria-label="action">' +
+                            '<a href="javascript:editItem(' + data[i].id + ');" title="Editar"><button type="button" class="btn btn-sm btn-outline-secondary me-1"><i class="bi bi-archive"></i></button></a>' +
+                            `<button type="button" class="btn btn-sm btn-outline-danger me-1" onClick="endOfLife(${data[i].id})"><i class="bi bi-pencil-square"></i></button>` +
                             '<a href="javascript:delItem(' + data[i].id + ');" title="Eliminar"><button type="button" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button></a>' +
                             '</div></td>'
                         auxTable += '</tr>';
@@ -113,7 +124,7 @@ function getItemTypes(v_id) {
 }
 
 function editItem(v_id) {
-    const token=getCookie("login")
+    const token=getCookie('login')
     let typeId = ''
     let name = ''
     let description = ''
@@ -130,7 +141,10 @@ function editItem(v_id) {
             createdAt = data.createdAt;
             typeId = data.typeId;
             categoryId = data.item_type.item_category.id;
-            select = "";
+            let subsection
+            if (!data.subsection) subsection = null
+            else subsection = data.subsection.id
+            let select, selectGroup
             (async () => {
                 await $.ajax({
                     url: linkUrl + "/item/category/all",
@@ -174,6 +188,27 @@ function editItem(v_id) {
                         select2 += '</select>'
                     },
                 })
+                await $.ajax({
+                    url: linkUrl + "/subsection/all",
+                    type: "GET",
+                    beforeSend: function (xhr) { xhr.setRequestHeader('x-access-token', token)},
+                    success: function (data) {
+                        msg = data.message
+                        selectGroup = '<select id="subsection" class="form-select">' +
+                            '<option value=""></option>';
+                        data = data.data;
+                        if (data.length > 0) {
+                            for (i in data) {
+                                selectGroup += '<option value="' + data[i].id + '"';
+                                if (data[i].id == subsection) {
+                                    selectGroup += 'selected';
+                                }
+                                selectGroup += ' >' + data[i].subsection + '</option>';
+                            }
+                        }
+                        selectGroup += '</select>'
+                    },
+                })
                 const { value: editItem } = await Swal.fire({
                     title: "Editar item",
                     showCancelButton: true,
@@ -201,6 +236,10 @@ function editItem(v_id) {
                         '<input type="date" id="purchasedAt" class="form-control" value="' + purchasedAt + '" required>' +
                         '</div>' +
                         '<div class="input-group input-group-sm mb-3">' +
+                        '<label class="input-group-text" for="subsection">Grupo</label>' +
+                        selectGroup +
+                        '</div>' +
+                        '<div class="input-group input-group-sm mb-3">' +
                         '<label class="input-group-text" for="category">Categoria</label>' +
                         select +
                         '</div>' +
@@ -217,8 +256,8 @@ function editItem(v_id) {
                         if (!document.getElementById("purchasedAt").value) {
                             error_msg += '"Aquisição" é um campo obrigatório.<br>'
                         }
-                        if (!document.getElementById("type").value) {
-                            error_msg += '"Tipo" é um campo obrigatório.'
+                        if (!document.getElementById('subsection').value) {
+                            error_msg += '"Grupo" é um campo obrigatório.'
                         }
                         if (error_msg) {
                             Swal.showValidationMessage(error_msg);
@@ -227,7 +266,8 @@ function editItem(v_id) {
                             document.getElementById("name").value,
                             document.getElementById("description").value,
                             document.getElementById("purchasedAt").value,
-                            document.getElementById("type").value
+                            document.getElementById("type").value,
+                            document.getElementById('subsection').value
                         ];
                     },
                 });
@@ -237,6 +277,7 @@ function editItem(v_id) {
                         description: editItem[1],
                         purchasedAt: editItem[2],
                         typeId: editItem[3],
+                        subsectionId: editItem[4]
                     };
                     const json = JSON.stringify(objItem);
                     $.ajax({
@@ -247,6 +288,7 @@ function editItem(v_id) {
                         dataType: "json",
                         beforeSend: function (xhr) { xhr.setRequestHeader('x-access-token', token)},
                         success: function (result) {
+                            console.log(result)
                             Swal.fire({
                                 icon: "success",
                                 title: result.message,
@@ -258,6 +300,7 @@ function editItem(v_id) {
 
                         },
                         error: function (err) {
+                            console.log(err)
                             msg = JSON.parse(err.responseText);
                             Swal.fire({
                                 icon: 'error',
@@ -317,7 +360,7 @@ function delItem(v_id) {
 }
 
 function createItem() {
-    let select = '';
+    let select, selectGroup
     (async () => {
         const token=getCookie('login')
         await $.ajax({
@@ -336,6 +379,24 @@ function createItem() {
                     }
                 }
                 select += '</select>'
+            },
+        })
+        await $.ajax({
+            url: linkUrl + "/subsection/all",
+            type: "GET",
+            beforeSend: function (xhr) { xhr.setRequestHeader('x-access-token', token)},
+            success: function (data) {
+                msg = data.message
+                selectGroup = '<select id="subsection" class="form-select">' +
+                    '<option value=""></option>';
+                data = data.data;
+                if (data.length > 0) {
+                    for (i in data) {
+                        selectGroup += '<option value="' + data[i].id + '"';
+                        selectGroup += ' >' + data[i].subsection + '</option>';
+                    }
+                }
+                selectGroup += '</select>'
             },
         })
         const { value: createItem } = await Swal.fire({
@@ -365,6 +426,10 @@ function createItem() {
                 '<input type="date" id="purchasedAt" class="form-control" required>' +
                 '</div>' +
                 '<div class="input-group input-group-sm mb-3">' +
+                '<label class="input-group-text" for="subsection">Grupo</label>' +
+                selectGroup +
+                '</div>' +
+                '<div class="input-group input-group-sm mb-3">' +
                 '<label class="input-group-text" for="category">Categoria</label>' +
                 select +
                 '</div>' +
@@ -383,8 +448,8 @@ function createItem() {
                 if (!document.getElementById('purchasedAt').value) {
                     errorMsg += '"Aquisição" é um campo obrigatório.<br>'
                 }
-                if (!document.getElementById('type').value) {
-                    errorMsg += '"Tipo" é um campo obrigatório.<br>'
+                if (!document.getElementById('subsection').value) {
+                    errorMsg += '"Grupo" é um campo obrigatório.<br>'
                 }
                 if (errorMsg) Swal.showValidationMessage(errorMsg)
                 return [
@@ -392,6 +457,7 @@ function createItem() {
                     document.getElementById("description").value,
                     document.getElementById("purchasedAt").value,
                     document.getElementById("type").value,
+                    document.getElementById('subsection').value
                 ];
             },
         });
@@ -400,7 +466,8 @@ function createItem() {
                 name: createItem[0],
                 description: createItem[1],
                 purchasedAt: createItem[2],
-                typeId: createItem[3]
+                typeId: createItem[3],
+                subsectionId: createItem[4]
             };
             const json = JSON.stringify(objItem);
             $.ajax({
@@ -416,6 +483,47 @@ function createItem() {
                         title: result.message,
                         showConfirmButton: false,
                         timer: 1500,
+                    }).then(function () {
+                        getAllItens();
+                    });
+                },
+                error: function (err) {
+                    msg = JSON.parse(err.responseText);
+                    Swal.fire({
+                        icon: 'error',
+                        text: msg.message,
+                        confirmButtonColor: '#212529',
+                    })
+                }
+            });
+        }
+    })();
+}
+
+function endOfLife(v_id) {
+    (async () => {
+        const { value: endOfLife } = await Swal.fire({
+            title: 'Tem a certeza?',
+            text: 'Será permanentemente arquivado como artigo em fim de vida.',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            confirmButtonText: 'Arquivar',
+            confirmButtonColor: '#d33',
+            cancelButtonText: "Cancelar",
+        });
+        const token=getCookie('login')
+        if (endOfLife) {
+            $.ajax({
+                url: linkUrl + "/item/" + v_id + '/endoflife',
+                type: "PUT",
+                beforeSend: function (xhr) { xhr.setRequestHeader('x-access-token', token)},
+                success: function (result) {
+                    Swal.fire({                        
+                        icon: 'success',
+                        title: result.message,
+                        timer: 1500,
+                        showConfirmButton: false,
                     }).then(function () {
                         getAllItens();
                     });
@@ -552,6 +660,89 @@ function viewInspection(v_id) {
             })
         }
     })
+}
+
+function getAllHistory() {
+    let category = document.getElementById("category").value;
+    (async () => {
+        if (category == "") {
+            searchUrl = "/item/history";
+        } else {
+            searchUrl = "/item/history?category=" + category;
+        }
+        token = getCookie("login");
+        await $.ajax({
+            url: linkUrl + searchUrl,
+            type: "GET",
+            beforeSend: function (xhr) { xhr.setRequestHeader('x-access-token', token); },
+            success: function (data) {
+                msg = data.message
+                table = document.getElementById('AllItens');
+                data = data.data;
+                if (data.length > 0) {
+                    auxTable = '<table class="table table-hover align-middle" id="itens">' +
+                        '<tr class="d-flex">' +
+                        '<th class="col-1 text-center">Cód.</th>' +
+                        '<th class="col-2">Nome</th>' +
+                        '<th class="col-5">Descrição</th>' +
+                        '<th class="col-1">Aquisição</th>' +
+                        '<th class="col-2">Tipo</th>' +
+                        '<th class="col-1 text-center">Inspecções</th>' +
+                        '</tr>';
+                    for (i in data) {
+                        let code, description
+                        if (!data[i].subsection || !data[i].code) code = 'N/D'
+                        else {
+                            data[i].code = (data[i].code).toLocaleString(undefined, {minimumIntegerDigits: 2, useGrouping:false})
+                            code = data[i].subsection.code + ''+ data[i].subsection.section.code +'.'+ data[i].item_type.item_category.code +''+ data[i].code
+                        }
+                        if (!data[i].description) description = '<i class="text-muted">Sem descrição</i>'
+                        else description = data[i].description
+                        auxTable += '<tr class="d-flex">' +
+                            '<td class="col-1 fs-7 text-center">' + code + '</td>' +
+                            '<td class="col-2">' + data[i].name + '</td>' +
+                            '<td class="col-5">' + description + '</td>' +
+                            '<td class="col-1 fs-7"> ' + data[i].purchasedAt + '</td>';
+                        auxTable += '<td class="col-2"> ' + data[i].item_type.type + '</td>' +
+                            '<td class="col-1 text-center"><div class="btn-group" role="group" aria-label="inspection">' +
+                            '<a href="javascript:viewInspection(' + data[i].id + ');" title="Ver inspecções"><button type="button" class="btn btn-sm btn-outline-info"><i class="bi bi-file-text"></i></button></a>' +
+                            '</div></td>'
+                        auxTable += '</tr>';
+                    }
+                    table.innerHTML = auxTable + '</table>';
+                } else {
+                    table.innerHTML = '<div class="alert alert-danger" role="alert">' +
+                        'Não existem utilizadores.' +
+                        '</div>';
+                }
+            },
+            error: function (err) {
+                document.getElementById('AllItens').innerHTML = '<div class="alert alert-danger" role="alert">' +
+                    err.responseJSON.message +
+                    '</div>';
+                exit = err;
+            }
+        })
+    })();
+}
+
+function toggleArquivados() {
+    const button = document.getElementById('toggleArquivados')
+    const cat = document.getElementById('categorySelect')
+    if (button.checked) {
+        getAllHistory()
+        cat.classList.add('d-none')
+    } else {
+        getAllItens()
+        cat.classList.remove('d-none')
+    }
+}
+
+function resetToggle() {
+    const button = document.getElementById('toggleArquivados')
+    if (button.checked) {
+        button.checked = false
+    }
 }
 
 function changeCategory() {
