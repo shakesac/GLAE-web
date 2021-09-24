@@ -69,27 +69,27 @@ function getMenu(){
             '</h6>'+
             '<ul class="nav flex-column mb-2">'+
                 '<li class="nav-item">'+
-                '<a class="nav-link" href="/admin/leases.html?status=inProgress">'+
-                    '<i class="bi bi-clipboard-data pe-2"></i>'+
-                    'Em curso'+
-                '</a>'+
-                '</li>'+
-                '<li class="nav-item">'+
                 '<a class="nav-link" href="/admin/leases.html?status=pending">'+
                     '<i class="bi bi-clipboard pe-2"></i>'+
                     'Pendentes'+
                 '</a>'+
                 '</li>'+
                 '<li class="nav-item">'+
-                '<a class="nav-link" href="/admin/leases.html?status=returned">'+
+                '<a class="nav-link" href="/admin/leases.html?status=approved">'+
                     '<i class="bi bi-clipboard-check pe-2"></i>'+
-                    'Concluídos'+
+                    'Aprovados'+
                 '</a>'+
                 '</li>'+
                 '<li class="nav-item">'+
-                '<a class="nav-link" href="/admin/leases.html?status=canceled">'+
+                '<a class="nav-link" href="/admin/leases.html?status=inProgress">'+
+                    '<i class="bi bi-clipboard-data pe-2"></i>'+
+                    'Em curso'+
+                '</a>'+
+                '</li>'+
+                '<li class="nav-item">'+
+                '<a class="nav-link" href="/admin/leases.html">'+
                     '<i class="bi bi-clipboard-x pe-2"></i>'+
-                    'Cancelados'+
+                    'Todos'+
                 '</a>'+
                 '</li>'+
             '</ul>';
