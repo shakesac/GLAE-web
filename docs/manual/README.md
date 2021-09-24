@@ -1,8 +1,9 @@
 # :open_book: Manual de Utilizador
 
 ## :bookmark: Índice
-* ### Primeiro arranque
+* ### Primeiro arranque & Autenticação
     * [Registo e Inicio de Sessão](#registo-e-inicio-de-sessão)
+    * [Terminar sessão](#terminar-sessao)
 * ### Administração
     * [Utilizadores](#utilizadores)
     * [Secções e grupos](#secções-e-grupos)
@@ -11,13 +12,14 @@
     * [Categorias e tipos](#categorias-e-tipos-de-material)
     * [Emprestimos](#emprestimos)
 * ### Utilizador
-    * [Pedir emprestimo][9]
-    * [Ver emprestimos][10]
-    * [Perfil][11]
+    * [Perfil](#perfil)
+    * [Solicitar emprestimo](#solicitar-emprestimo)
+    * [Consultar emprestimos](#consultar-emprestimos)
+
 
 
 [2]:-
-## Primeiro Arranque
+## :key: Primeiro Arranque & Autenticação
 ### Registo e Inicio de sessão
 
 No primeiro arranque do backend é criado um utilizador com permissões de administração. Deverá iniciar sessão com esse utilizador e alterar o email e a senha através página de gestão de utilizadores.
@@ -27,6 +29,14 @@ Utilizador: `admin@1240.pt` e a senha: `escutas2021`.
 ![Login e registo](imgs/login.png)
 
 Todos os campos solicitados no formulário de registo são de preenchimento obrigatório. O utilizador deverá indicar qual o grupo a que pertence. Caso os dados preenchidos estejam incorrectos, o administrador poderá alterá-los posteriormente.
+
+### Terminar sessão
+Aos findar a utilização da ferramenta deverá sempre terminar a sessão.
+
+Na administração bastará clicar em Terminar sessão na no canto superior direito do ecrã.
+
+Nas páginas de utilizador deverá abrir o menu ![perfil](imgs/menuperfil.png) e clicar em Terminar sessão.
+Caso tenha artigos no cesto estes serão apagados.
 
 
 ## :books: Administração
@@ -132,10 +142,13 @@ Neste página são listados os emprestimos. Todos os emprestimos têm estados as
 Não é possível criar um emprestimo ou editar as datas de um emprestimo existente.
 
 #### :heavy_check_mark::no_entry: Acções e restrições
-* É possível remover artigos de emprestimos que estejam nos estados Pendentes e Aprovados recorrendo ao botão ![Ver material](imgs/listarmaterialbotao.png). Não é permitido fazê-lo em estados finais ou no decorrer de um emprestimo.
-* A qualquer momento é possível visualizar o histórico de alterações de estado de um emprestimo. ![Ver histórico](imgs/listarestados.png) 
+* É possível remover artigos de emprestimos que estejam nos estados Pendentes e Aprovados recorrendo ao botão ![Ver material](imgs/listarmaterialbotao.png). Não é permitido fazê-lo em estados finais ou no decorrer de um emprestimo. Também não é possível remover artigos até ficar com um emprestimo vazio. Não será possível remover o último artigo presente na lista.
 
 ![Lista de estados](imgs/listamaterial.png)
+
+* A qualquer momento é possível visualizar o histórico de alterações de estado de um emprestimo. ![Ver histórico](imgs/listarestados.png) 
+
+
 
 ##### Botões de alteração de estado
 * ![Aceitar-Rejeitar](imgs/acceptreject.png) Estes são os botões de acção quando o estado do emprestimo é Pendente. Botão de 'Aprovado' e botão de 'Não aprovado' respectivamente.
@@ -143,8 +156,47 @@ Não é possível criar um emprestimo ou editar as datas de um emprestimo existe
 * ![Terminar](imgs/terminar.png) Este botão de acção é mostrado quando o emprestimo está em curso. Quando accionado finaliza o emprestimo e arquiva-o.
 
 
-## Utilizador
+## :standing_person::standing_woman: Utilizador
 ### Perfil
+Esta página de perfil é acessivel através do menu ![perfil](imgs/menuperfil.png) e escolhendo a opção Editar Informações. 
+
+#### :pencil2: Edição
+O utilizador pode editar os seus dados ou alterar a sua senha. Os campos email e cargo são imutaveis. O campo cargo apenas pode ser editado por um administrador.
+
+Para alterar a senha será necessário introduzir a sua senha actual para confirmar-se que é o próprio que pertende alterar a senha.
+![Alterar senha](imgs/alterarsenhaut.png)
+
+
+### Solicitar emprestimo
+Nesta página serão apresentados ao utilizador os artigos disponíveis para emprestimo.
+
+#### :date: Escolher data
+Deverá começar o pedido por selecionar um intervalo de datas. Caso o emprestimo comece e termine no mesmo dia deverá selecionar a opção ![Um só dia](imgs/umsodia.png) antes de selecionar uma data.
+
+#### :shopping_cart: Selecção de artigos & cesto
+Após a data escolhida serão apresentados todos os artigos disponiveis durante esse periodo.
+Todos os artigos associados a um emprestimo nos estados pendente, aprovado e em curso no intervalo de datas selecionado não serão listados.
+Os artigos poderão ser filtrados pela categoria.
+
+Para adicionar um artigo ao cesto deverá carregar no botão ![+](imgs/additem.png). O artigo desaparecerá da lista e é adicionado ao cesto. 
+
+Os artigos adicionados ao cesto podem ser visualizados através do botão ![cesto](imgs/cesto.png).
+
+![Lista artigos cesto](imgs/vercesto.png)
+
+Os artigos poderão ser retirados do cesto e voltarão a aparecer na lista de artigos disponíveis.
+
+Só é possível finalizar um pedido de encomenda caso o cesto tenha pelo menos um artigo adicionado.
+Após finalizar a encomenda será reencaminhado para a página de consulta de emprestimos e o emprestimo mais recente aparecerá no topo da lista com o estado pendente.
+
+### Consultar emprestimos
+Aqui serão listados todas as solicitações de empresto realizadas pelo utilizador.
+Os artigos mais recentes aparecem no topo e podem ser filtrados por estados.
+
+#### :heavy_check_mark::no_entry: Acções e restrições
+* ![Cancelar](imgs/cancelado.png) Um pedido pode ser cancelado a qualquer momento pelo utilizador deste que o pedido esteja Pendete ou Aprovado. O utilizador deverá expor a razão na caixa de texto.
+* ![Ver itens](imgs/listarmaterialbotao.png) Mostra todos os artigos pertencentes ao emprestimo. Não existe a possibilidade de alterar a lista após finalização do pedido.
+* ![Histórico de estados](imgs/listarestados.png) Mostra o histórico de estados e respectivos comentários adicionados pelo administrador.
 
 
 
